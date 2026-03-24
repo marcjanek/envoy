@@ -1,0 +1,34 @@
+name: Fork - Test proxy_protocol changes
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - mm/change
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Test proxy_protocol filter
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
+          sudo apt-get clean
+          df -h
+
+      - name: Run proxy_protocol tests
+        run: |
+          mkdir -p /tmp/envoy-docker-build
+          USER_GID=1000 \
+          ENVOY_DOCKER_BUILD_DIR=/tmp/envoy-docker-build \
+            ./ci/run_envoy_docker.sh \
+              "./ci/do_ci.sh release.test_only //test/extensions/filters/listener/proxy_protocol/..."
+
