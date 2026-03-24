@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - mm/change
+      - mm/change1
 
 permissions:
   contents: read
